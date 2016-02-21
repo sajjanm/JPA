@@ -1,0 +1,90 @@
+public class StudentDAOImpl implements StudentDAO {
+
+    List<String> emailCheck = new ArrayList<>();
+    List<Student> studentCollection = new ArrayList<>();
+    File f1,f2;
+            
+    @Override
+    public void insert(Student s) {
+        studentCollection.add(s);
+    }
+    
+
+    @Override
+    public boolean delete(int id) {
+        boolean sucess= false;
+        for(Student s: studentCollection){
+            if(s.getId()==id){
+                studentCollection.remove(s);
+                sucess= true;
+                break;
+            }
+        }
+        return sucess;
+        
+    }
+
+    @Override
+    public Student getById(int id) {
+        Student student = null;
+        for(Student s: studentCollection){
+            if(s.getId()==id){
+                student= s;
+                break;
+            }
+        }
+        return student;
+    }
+
+        @Override
+    public List<Student> showAll() {
+        return studentCollection;
+    }
+
+    @Override
+    public void importFromFile() {
+        try{
+            BufferedReader br = new BufferedReader(new FileReader(new File("D:\\Leapfrog-jee\\day 7\\student.txt") ) );
+            String line="";       
+            System.out.println("Enter the location to save duplicate data with File name");
+            Scanner reader = new Scanner(System.in);
+            f2= new File(reader.nextLine());
+            FileWriter fw = new FileWriter( f2 );
+            
+            while ( (line=br.readLine())!=null ){
+                StringTokenizer token = new StringTokenizer(line, ",");
+                Student e = new Student();
+
+                e.setId(Integer.parseInt(token.nextToken()));
+                e.setFirstName(token.nextToken());
+                e.setLastName(token.nextToken());
+                e.setEmail(token.nextToken());
+                e.setContactNo(token.nextToken());
+                e.setStatus(Boolean.parseBoolean(token.nextToken() ) );
+                
+                if( isEmailExist(e.getEmail() ) ){
+                    emailCheck.add(e.getEmail());  // since the email doesnt match so adding it to the record
+                    studentCollection.add(e);  // and saving the objects into arraylist to get if afterwards
+                }
+                else{  // the case for which the email exists 
+                    fw.write(line);
+                }
+            }
+            br.close();
+            fw.close();            
+        }catch(IOException ioe){
+            System.out.println(ioe.getMessage() );
+        }
+        
+    }
+
+    @Override
+    public boolean isEmailExist(String s) {
+        boolean a = true;
+        if( emailCheck.contains(s) ){    
+            a= false;// false means the value exists
+        }    
+        return a;//if return true, then mathi gayera arraylist ma add garne
+    }
+
+}
